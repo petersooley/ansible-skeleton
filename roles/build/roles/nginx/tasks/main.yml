@@ -1,0 +1,45 @@
+- name: "Install nginx"
+  apt: pkg=nginx state=latest
+  register: installed
+
+- name: "Remove the default nginx config"
+  file:
+    path: /etc/nginx/{{ item }}/default
+    state: absent
+  when: installed.changed
+  with_items:
+    - sites-enabled
+    - sites-available
+
+- name: "Make sure log directory exists"
+  file:
+    path: "{{ nginx_log_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: www-data
+
+- name: "Create log files"
+  file:
+    path: "{{ nginx_log_dir}}/{{ item }}"
+    state: touch
+    owner: "{{ ansible_user }}"
+    group: www-data
+  with_items:
+    - error.log
+    - access.log
+
+- name: "Add app vhost"
+  template:
+    src: vhost.conf.j2
+    dest: "/etc/nginx/sites-available/{{ app_name }}_{{ app_env }}.conf"
+
+- name: "Enable app vhost"
+  file:
+    src: "/etc/nginx/sites-available/{{ app_name }}_{{ app_env }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ app_name }}_{{ app_env }}.conf"
+    state: link
+
+- name: "Add log rotation config"
+  template:
+    src: logrotate.conf.j2
+    dest: "/etc/logrotate.d/nginx_{{ app_name }}"

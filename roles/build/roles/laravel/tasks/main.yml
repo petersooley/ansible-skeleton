@@ -1,0 +1,13 @@
+- name: "Set up artisan scheduler"
+  cron:
+    job: "run-one {{ deploy_dir }}/current/artisan schedule:run 1>> /dev/null 2>&1"
+    state: present
+    user: www-data
+    name: "{{ app_name }}_{{ app_env }} => php artisan schedule:run"
+
+- name: "Set up artisan scheduler queue"
+  cron:
+    job: "run-one {{ deploy_dir }}/current/artisan queue:work --daemon --sleep=5 --delay=60 --tries=3 1>> /dev/null 2>&1"
+    state: present
+    user: www-data
+    name: "{{ app_name }}_{{ app_env }} => php artisan queue:listen"

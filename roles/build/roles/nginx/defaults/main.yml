@@ -1,0 +1,2 @@
+nginx_log_dir: /var/www/{{ app_name }}/{{ app_env }}/shared/logs/nginx
+nginx_error_level: error

@@ -1,0 +1,4 @@
+app_env: dev
+app_domain: demo.dev
+app_ip: 10.0.16.21
+app_key: base64:xjrdVcgJVMfgNDokhkrMrsfz3zlcNPqw9UBJ9in2myQ=

@@ -1,0 +1,71 @@
+- name: "Create shared directories"
+  become: true
+  file:
+    path: "{{ deploy_dir }}/shared/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: 0775
+  with_items:
+    - app/public
+    - framework/cache
+    - framework/sessions
+    - framework/views
+    - logs/app
+
+- name: "Create .env file"
+  become: true
+  template:
+    src: "{{ inventory_dir }}/templates/env.j2"
+    dest: "{{ deploy_dir }}/shared/.env"
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: 0775
+
+- name: "Create laravel.log file"
+  become: true
+  file:
+    path: "{{ deploy_dir }}/shared/logs/app/laravel.log"
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: 0775
+    state: touch
+
+- name: "Removing items in release to be symlinked"
+  file:
+    path: "{{ release_dir }}/{{ item }}"
+    state: absent
+  with_items:
+    - .env
+    - storage
+    - logs
+
+- name: "Making storage directory"
+  become: true
+  file:
+    path: "{{ release_dir }}/storage"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: 0775
+
+- name: "Make shared symlinks"
+  become: true
+  file:
+    dest: "{{ release_dir }}/{{ item.release }}"
+    src: "{{ deploy_dir }}/shared/{{ item.shared }}"
+    state: link
+    force: true
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: 0775
+  with_items:
+    - shared: .env
+      release: .env
+    - shared: app
+      release: storage/app
+    - shared: framework
+      release: storage/framework
+    - shared: logs/app
+      release: storage/logs
+

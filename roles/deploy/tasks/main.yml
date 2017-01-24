@@ -1,0 +1,6 @@
+- include: release.yml
+- include: dumps.yml
+- include: shared.yml
+- include: build.yml
+- include: symlink.yml
+- include: cleanup.yml

@@ -1,0 +1,5 @@
+- name: "Clean up old releases"
+  shell: "ls -1dt {{ deploy_dir }}/releases/* | tail -n +6 | xargs rm -rf"
+
+- name: "Clean up old dumps"
+  shell: "ls -1dt {{ deploy_dir }}/dumps/* | tail -n +6 | xargs rm -rf"

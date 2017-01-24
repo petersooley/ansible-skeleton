@@ -1,0 +1,45 @@
+- name: "Setting pool name"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: \[www\]
+    line: "[{{ app_name}}-{{ app_env }}]"
+
+- name: "Setting pool socket"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*listen\s*=
+    line: listen = /run/php/php7.0-fpm-{{ app_name }}-{{ app_env }}.sock
+
+- name: "Setting development error reporting level"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*php_value\[error_reporting\]\s*=
+    line: php_value[error_reporting] = E_ALL
+  when: app_env == "dev"
+
+- name: "Displaying errrors during development"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*php_flag\[display_errors\]\s*=
+    line: php_flag[display_errors] = On
+  when: app_env == "dev"
+
+- name: "Make sure log directory exists"
+  file:
+    path: "{{ php_log_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: www-data
+
+- name: "Create log file"
+  file:
+    path: "{{ php_log_dir}}/error.log"
+    state: touch
+    owner: "{{ ansible_user }}"
+    group: www-data
+
+- name: "Setting php fpm pool error log"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*php_admin_value\[error_log\]\s*=
+    line: php_admin_value[error_log] = {{ php_log_dir }}/error.log

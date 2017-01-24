@@ -1,0 +1,50 @@
+- stat: path="{{ release_dir }}/package.json"
+  register: package_json
+- stat: path="{{ release_dir }}/composer.json"
+  register: composer_json
+
+- name: "Installing composer dependencies"
+  composer:
+    command: install
+    no_dev: true
+    optimize_autoloader: true
+    prefer_dist: true
+    working_dir: "{{ release_dir }}"
+  when: composer_json.stat.exists
+
+- name: "Setting permissions on composer dependencies"
+  become: true
+  file:
+    path: "{{ release_dir }}/vendor"
+    owner: "{{ ansible_user }}"
+    group: www-data
+    recurse: true
+    state: directory
+
+
+#- name: "Prefer global node-sass"
+#  command: npm link node-sass
+#  args:
+#    chdir: "{{ working_dir }}"
+#  when: package_json.stat.exists
+
+- name: "Installing assets"
+  command: npm install --production --no-optional
+  args:
+    chdir: "{{ release_dir }}"
+  when: package_json.stat.exists
+
+#- name: "Building assets"
+#  command: npm run build
+#  args:
+#    chdir: "{{ working_dir }}"
+#  when: package_json.stat.exists
+
+- name: "Setting permissions on node dependencies"
+  become: true
+  file:
+    path: "{{ release_dir }}/node_modules"
+    owner: "{{ ansible_user }}"
+    group: www-data
+    recurse: true
+    state: directory

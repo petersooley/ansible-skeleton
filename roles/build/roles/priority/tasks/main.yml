@@ -1,0 +1,42 @@
+---
+#- name: Ensure apt cache is updated.
+#  apt:
+#    update_cache: yes
+#    cache_valid_time: 3600
+#    upgrade: full
+
+- apt: "name={{ item }} state=installed"
+  with_items:
+    - git
+    - wget
+    - curl
+    - vim
+    - run-one
+
+# https://gist.github.com/garethrees/5591027
+- name: "Set timezone variables"
+  copy: content='America/Chicago\n'
+        dest=/etc/timezone
+        owner=root
+        group=root
+        mode=0644
+        backup=yes
+  notify:
+    - update timezone
+
+- name: "Uninstalling apache"
+  apt:
+    name: apache2
+    state: absent
+    autoremove: true
+    purge: true
+
+- name: "Removing apache configs"
+  file:
+    path: /etc/apache2
+    state: absent
+
+- name: "Removing /var/www/html"
+  file:
+    path: /var/www/html
+    state: absent

@@ -1,0 +1,4 @@
+local_ssh_key_dir: "~/.ssh/ansible/{{ app_name }}"
+local_ssh_key_private: "{{ local_ssh_key_dir }}/id_rsa"
+local_ssh_key_public: "{{ local_ssh_key_dir }}/id_rsa.pub"
+escaped_ssh_password: "{{ our_ssh_password|replace('\"', '\\\"') }}"

@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: true
+  vars:
+    xdebug_port: 9001
+  tasks:
+    - apt: name=php-xdebug state=present
+    - blockinfile:
+        dest: /etc/php/7.0/fpm/conf.d/20-xdebug.ini
+        marker: "; {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          xdebug.remote_enable = 1
+          xdebug.remote_connect_back = 1
+          xdebug.remote_port = {{ xdebug_port }}
+    - service: name=apache2 state=restarted

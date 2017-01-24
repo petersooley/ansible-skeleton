@@ -1,0 +1,16 @@
+---
+- name: "Install wkhtmltopdf deb"
+  apt:
+    deb: http://security.ubuntu.com/ubuntu/pool/universe/w/wkhtmltopdf/wkhtmltopdf_0.12.2.4-1_amd64.deb
+  when: ansible_distribution_release != "xenial"
+
+- name: "Install xvfb & wkhtmltopdf packages"
+  apt: name={{ item }}
+  with_items:
+    - xvfb
+    - wkhtmltopdf
+- name: "Add wrapper script to run wkhtmltopdf through xvfb"
+  copy:
+    src: wkhtmltopdf.sh
+    dest: /usr/local/bin/wkhtmltopdf
+    mode: 0755

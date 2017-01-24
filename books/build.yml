@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+  vars:
+
+    nodejs_version: "6.x"
+
+    mysql_packages:
+      - mariadb-client
+      - mariadb-server
+      - python-mysqldb
+    mysql_databases:
+      - name: "{{ mysql_database }}"
+    mysql_users:
+      - name: "{{ mysql_username }}"
+        host: "%"
+        password: "{{ mysql_password }}"
+        priv: "{{ app_name}}_{{ app_env}}.*:ALL"
+
+  roles:
+  - { role: build/roles/priority }
+  - { role: geerlingguy.nodejs }
+  - { role: geerlingguy.mysql }
+  - { role: build/roles/nginx }
+  - { role: build/roles/php }
+  - { role: geerlingguy.composer }
+  - { role: build/roles/wkhtmltopdf }
+  - { role: build/roles/laravel }

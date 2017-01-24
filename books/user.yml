@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: false
+  vars_prompt:
+    - name: "app_name"
+      prompt: "What is the project name?"
+      private: no
+    - name: "app_ip"
+      prompt: "What is the remote server IP (or domain if DNS enabled)?"
+      private: no
+    - name: "our_ssh_password"
+      prompt: "Create a password for your ssh key"
+      private: yes
+    - name: "our_user_name"
+      prompt: "What is the name of the remote user?"
+      private: no
+    - name: "our_user_password"
+      prompt: "Create a password for the user"
+      private: yes
+  roles:
+    - { role: user }

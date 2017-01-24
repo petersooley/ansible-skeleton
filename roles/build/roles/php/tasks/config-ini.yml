@@ -1,0 +1,96 @@
+- name: "Disable fix_pathinfo"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*cgi.fix_pathinfo\s*=
+    line: cgi.fix_pathinfo = 0
+
+- name: "Ensure timezone is set in php.ini"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*date.timezone\s*=
+    line: date.timezone = {{ php_timezone }}
+
+- name: "Enabling opcache"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*opcache.enable=\s*=
+    line: opcache.enable = 1
+
+- name: "Opcache - changing revalidate frequency to 0"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*opcache.revalidate_freq\s*=
+    line: opcache.revalidate_freq = 0
+
+- name: "Set session.cookie_httponly to `true`"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*session.cookie_httponly\s*=
+    line: session.cookie_httponly = 1
+
+- name: "Enable session strict mode"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*session.use_strict_mode\s*=
+    line: session.use_strict_mode = 1
+
+- name: "Disable url fopen"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*allow_url_fopen\s*=
+    line: allow_url_fopen = Off
+
+- name: "Change soap.wsdl_cache_dir to new directory"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*soap.wsdl_cache_dir\s*=
+    line: soap.wsdl_cache_dir = /php/cache/wsdl
+
+- name: "Change upload_tmp_dir path"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*upload_tmp_dir\s*=
+    line: upload_tmp_dir = /php/cache/upload_tmp
+
+- name: "Exclude potentially harmfull php functions"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*disable_functions\s*=
+    line: disable_functions = exec,passthru,system,popen
+
+- name: "Set post_max_size"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*post_max_size\s*=
+    line: post_max_size = {{ php_post_max_size }}
+
+- name: "Set upload_max_filesize"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*upload_max_filesize\s*=
+    line: upload_max_filesize = {{ php_upload_max_filesize }}
+    create: yes
+
+- name: "Set memory_limit"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*memory_limit\s*=
+    line: memory_limit = {{ php_memory_limit }}
+
+- name: "Set max_execution_time"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*max_execution_time\s*=
+    line: max_execution_time = {{ php_max_execution_time }}
+
+- name: "Set short_open_tag"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*short_open_tag\s*=
+    line: short_open_tag = {{ php_short_open_tag }}
+
+- name: "Hiding errors"
+  lineinfile:
+    dest: "{{ target }}"
+    regexp: ^\s*;?\s*display_errors\s*=
+    line: display_errors = Off

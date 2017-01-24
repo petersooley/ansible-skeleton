@@ -1,0 +1,30 @@
+- name: "Generate release timestamp"
+  command: date +%Y%m%d%H%M%S
+  register: current_release_version
+
+- set_fact:
+    release_dir: "{{ deploy_dir}}/releases/{{ current_release_version.stdout }}"
+
+- name: "Create releases directories"
+  become: true
+  file:
+    path: "{{ deploy_dir }}/releases"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: "Clone project repo"
+  git:
+    repo: "{{ app_repo }}"
+    dest: "{{ release_dir }}"
+    version: "{{ deploy_version }}"
+    accept_hostkey: true
+
+- name: "Setting permissions on release"
+  become: true
+  file:
+    path: "{{ release_dir }}"
+    owner: "{{ ansible_user }}"
+    group: www-data
+    recurse: true
+    state: directory

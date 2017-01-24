@@ -1,0 +1,12 @@
+- name: "Create dumps directory"
+  file:
+    path: "{{ deploy_dir }}/dumps"
+    state: directory
+
+- name: "Take a dump"
+  mysql_db:
+    name: "{{ mysql_database }}"
+    state: dump
+    login_user: "{{ mysql_username }}"
+    login_password: "{{ mysql_password }}"
+    target: "{{ deploy_dir }}/dumps/{{ current_release_version.stdout }}.sql"

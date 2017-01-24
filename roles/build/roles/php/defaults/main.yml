@@ -1,0 +1,22 @@
+php_memory_limit: "500M"
+php_upload_max_filesize: "500M"
+php_post_max_size: "500M"
+php_timezone: America/Chicago
+php_max_execution_time: "300"
+php_short_open_tag: On
+php_log_dir: /var/www/{{ app_name }}/{{ app_env }}/shared/logs/php
+php_packages:
+  - php7.0-common
+  - php7.0-cli
+  - php7.0-intl
+  - php7.0-curl
+  - php7.0-cgi
+  - php7.0-fpm
+  - php7.0-mysql
+  - php7.0-xml
+  - php7.0-zip
+  - php7.0-gd
+  - php7.0-sqlite3
+  - php-mbstring
+  - php-mcrypt
+  - php-imagick

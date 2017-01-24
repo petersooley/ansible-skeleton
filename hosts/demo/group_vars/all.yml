@@ -1,0 +1,10 @@
+app_name: demo
+app_repo: git@bitbucket.org:user/demo.com.git
+
+mysql_database: "{{ app_name }}_{{ app_env }}"
+mysql_username: "{{ app_name }}"
+mysql_password: "{{ vault_mysql_password }}"
+
+deploy_dir: "/var/www/{{ app_name }}/{{ app_env }}"
+public_dir: "{{ deploy_dir }}/current/public"
+deploy_version: master

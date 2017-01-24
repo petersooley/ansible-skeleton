@@ -1,0 +1,47 @@
+- name: "Add PHP 7.0 apt repository"
+  apt_repository:
+    repo: ppa:ondrej/php
+    update_cache: true
+
+- name: "Install PHP 7.0"
+  apt:
+    name: php7.0
+    state: latest
+
+- name: "Install PHP extensions"
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ php_packages }}"
+  when: php_packages is defined
+
+- name: "Removing irrelevant PHP configurations"
+  file:
+    path: "/etc/php/{{ item }}"
+    state: absent
+  with_items:
+    - 5.5
+    - 5.6
+    - 7.0/cgi
+    - 7.0/apache2
+
+- name: "Configuring PHP"
+  include: config-ini.yml target=/etc/php/7.0/fpm/php.ini
+
+- name: "Add log rotation config"
+  template:
+    src: logrotate-fpm.conf.j2
+    dest: "/etc/logrotate.d/php7.0-fpm"
+
+- name: "Remove default pool config"
+  file:
+    path: "/etc/php/7.0/fpm/pool.d/www.conf"
+    state: absent
+
+- name: "Add pool config"
+  copy:
+    src: pool.conf
+    dest: "/etc/php/7.0/fpm/pool.d/{{ app_name }}-{{ app_env }}.conf"
+
+- name: "Configuring FPM Pool"
+  include: config-pool.yml target=/etc/php/7.0/fpm/pool.d/{{ app_name }}-{{ app_env }}.conf

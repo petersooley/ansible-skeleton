@@ -1,0 +1,5 @@
+- name: "Setting up symlink"
+  file:
+    src: "{{ deploy_dir}}/releases/{{ current_release_version.stdout }}"
+    dest: "{{ deploy_dir }}/current"
+    state: link

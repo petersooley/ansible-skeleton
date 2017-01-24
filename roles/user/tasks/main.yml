@@ -1,0 +1,51 @@
+- name: "Creating user"
+  user:
+    name: "{{ our_user_name }}"
+    password: "{{ our_user_password | password_hash('sha512') }}"
+    generate_ssh_key: yes
+    shell: /bin/bash
+    state: present
+    update_password: on_create
+
+- name: "Create local SSH directory"
+  file:
+    path: "{{ local_ssh_key_dir }}"
+    state: directory
+  delegate_to: localhost
+
+- name: "Creating SSH config file"
+  file:
+    path: ~/.ssh/config
+    state: touch
+    mode: 0600
+  delegate_to: localhost
+
+- name: "Generate local SSH keys"
+  command: ssh-keygen -t rsa -N "{{ escaped_ssh_password }}" -q -f {{ local_ssh_key_private }}
+  args:
+    creates: "{{ local_ssh_key_private }}"
+  delegate_to: localhost
+
+- name: "Updating ~/.ssh/config"
+  blockinfile:
+    dest: ~/.ssh/config
+    marker: "# {mark} {{ app_name }} ANSIBLE MANAGED BLOCK"
+    block: |
+      Host ed-{{ app_name }}
+          HostName {{ app_ip }}
+          User {{ our_user_name }}
+          IdentityFile {{ local_ssh_key_private }}
+          ForwardAgent yes
+  delegate_to: localhost
+
+- name: "Authorizing your local key"
+  authorized_key:
+    user: "{{ our_user_name }}"
+    key: "{{ lookup('file', local_ssh_key_public) }}"
+
+- name: "Adding sudo abilities"
+  lineinfile:
+    dest: "/etc/sudoers"
+    regexp: "{{ our_user_name }} ALL"
+    line: "{{ our_user_name }} ALL=(ALL) ALL"
+    state: present
